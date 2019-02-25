@@ -8,8 +8,10 @@ public class Player_Move : MonoBehaviour {
 
     public Vector2 vectorInput;
 
+    public float tankVelocity;
     public float forceMultiplier;
     public float torqueMultiplier;
+    public float inputToTorque;
 
 	// Use this for initialization
 	void Start () {
@@ -18,9 +20,22 @@ public class Player_Move : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        float inputVertical = Input.GetAxis("Vertical");
-        float inputHorizontal = Input.GetAxis("Horizontal");
+        vectorInput.y = Input.GetAxis("Vertical");
+        vectorInput.x = Input.GetAxis("Horizontal");
 
-        vectorInput = new Vector2(inputHorizontal, inputVertical);
+        //vectorInput = new Vector2(inputHorizontal, inputVertical);
+        inputToTorque = vectorInput.x;
 	}
+
+    void FixedUpdate()
+    {
+        tankVelocity = myRigidBody.velocity.magnitude;
+
+        if(myRigidBody.velocity.magnitude < 8f)
+        {
+            myRigidBody.AddForce(transform.forward * vectorInput.y * forceMultiplier, ForceMode.Impulse);
+        }
+
+        myRigidBody.AddTorque(0, inputToTorque * torqueMultiplier, 0, ForceMode.VelocityChange);
+    }
 }
