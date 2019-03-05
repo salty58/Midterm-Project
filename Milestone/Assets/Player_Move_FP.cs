@@ -17,9 +17,13 @@ public class Player_Move_FP : MonoBehaviour {
 
     public float velocityModifier;  // velocity of conroller multiplied by this number
 
+    //public float pitchMin;
+    //public float pitchMax;
+
     void Start()
     {
         thisRigidBody = GetComponent<Rigidbody>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
@@ -29,12 +33,15 @@ public class Player_Move_FP : MonoBehaviour {
 
         pitch = Input.GetAxis("Mouse Y");
         thisCamera.transform.Rotate(-pitch, 0, 0);
+        //thisCamera.transform.rotation = new Vector3(Mathf.Clamp(thisCamera.transform.rotation.x, pitchMin, pitchMax));
 
         fpForwardBackward = Input.GetAxis("Vertical");
         fpStrafe = Input.GetAxis("Horizontal");
 
         inputVelocity = transform.forward * fpForwardBackward;
         inputVelocity += transform.right * fpStrafe;
+
+        
     }
 
     void FixedUpdate()
