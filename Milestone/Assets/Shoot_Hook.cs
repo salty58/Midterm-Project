@@ -14,6 +14,8 @@ public class Shoot_Hook : MonoBehaviour {
     public float velocityModifier;
     public float cameraRayDistance = 1000f;
     public float grappleDis;
+    public float speed = 15f;
+    public float hookSpeed = 20f;
 
     public BoxCollider thisBoxCollider;
 
@@ -23,6 +25,10 @@ public class Shoot_Hook : MonoBehaviour {
 
     public Vector3 grapplePos;
 
+    public bool playerGrappleMove = false;
+
+    //private float startTime;
+
 	// Use this for initialization
 	void Start () {
         //prefab = Resources.Load("Hook") as GameObject;
@@ -30,34 +36,48 @@ public class Shoot_Hook : MonoBehaviour {
         thisTrailRenderer = GetComponent<TrailRenderer>();
         mainCamera = GetComponentInParent<Camera>();
         playerRigidBody = player.GetComponent<Rigidbody>();
+
+        //startTime = Time.time;
 	}
 	
 	// Update is called once per frame
 	void Update () {
         //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        Vector3 rayOrigin = mainCamera.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0.0f));
         RaycastHit hit;
+
+        //float distCovered = (Time.time - startTime) * speed;
+        //float fracJourney = distCovered / grappleDis;
+
+        float zoom = speed * Time.deltaTime;
+        float hookSpeedZoom = hookSpeed * Time.deltaTime;
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (Physics.Raycast(rayOrigin, mainCamera.transform.forward, out hit, cameraRayDistance))
+            if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, cameraRayDistance))
             {
 
                 //GameObject hook = Instantiate(prefab) as GameObject;
                 //hook.transform.position = transform.position + Camera.main.transform.forward * 2;
                 playerRigidBody.constraints = RigidbodyConstraints.FreezeAll;
                 thisRigidBody.isKinematic = false;
-                thisRigidBody.AddForce(hit.point + transform.forward * velocityModifier);
+                //thisRigidBody.AddForce(hit.point * hookSpeed);
+                transform.position = Vector3.MoveTowards(transform.position, hit.point, 1000f * Time.deltaTime);
                 thisTrailRenderer.enabled = true;
                 thisBoxCollider.enabled = true;
             }
+        }
+
+        if (playerGrappleMove)
+        {
+            player.transform.position = Vector3.MoveTowards(player.transform.position, grapplePos, zoom);
+            //playerGrappleMove = false;
         }
 	}
 
     void OnCollisionEnter(Collision collision)
     {
         //thisRigidBody.isKinematic = true;
-        thisTrailRenderer.enabled = false;
+        //thisTrailRenderer.enabled = false;
         grapplePos = transform.position;
         grappleDis = Vector3.Distance(player.transform.position, transform.position);
 
@@ -67,6 +87,6 @@ public class Shoot_Hook : MonoBehaviour {
         playerRigidBody.constraints = RigidbodyConstraints.None;
         playerRigidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
-        player.transform.position = Vector3.MoveTowards(player.transform.position, grapplePos, grappleDis - 1);
+        playerGrappleMove = true;
     }
 }
