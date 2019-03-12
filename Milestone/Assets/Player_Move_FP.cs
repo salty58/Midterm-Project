@@ -46,6 +46,6 @@ public class Player_Move_FP : MonoBehaviour {
 
     void FixedUpdate()
     {
-        thisRigidBody.velocity = inputVelocity * velocityModifier + (Physics.gravity * .69f);
+        thisRigidBody.velocity = inputVelocity * velocityModifier; // + (Physics.gravity * .69f);
     }
 }

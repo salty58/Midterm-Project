@@ -25,6 +25,10 @@ public class Shoot_Hook : MonoBehaviour {
 
     public Vector3 grapplePos;
 
+    Vector3 savedLocalPosition;
+    Vector3 savedLocalRotation;
+    Vector3 savedLocalScale;
+
     public bool playerGrappleMove = false;
 
     //private float startTime;
@@ -36,6 +40,10 @@ public class Shoot_Hook : MonoBehaviour {
         thisTrailRenderer = GetComponent<TrailRenderer>();
         mainCamera = GetComponentInParent<Camera>();
         playerRigidBody = player.GetComponent<Rigidbody>();
+
+        savedLocalPosition = this.transform.localPosition;
+        savedLocalRotation = this.transform.localEulerAngles;
+        savedLocalScale = this.transform.localScale;
 
         //startTime = Time.time;
 	}
@@ -51,18 +59,19 @@ public class Shoot_Hook : MonoBehaviour {
         float zoom = speed * Time.deltaTime;
         float hookSpeedZoom = hookSpeed * Time.deltaTime;
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out hit, cameraRayDistance))
             {
 
                 //GameObject hook = Instantiate(prefab) as GameObject;
                 //hook.transform.position = transform.position + Camera.main.transform.forward * 2;
+                playerRigidBody.useGravity = false;
                 playerRigidBody.constraints = RigidbodyConstraints.FreezeAll;
                 thisRigidBody.isKinematic = false;
                 //thisRigidBody.AddForce(hit.point * hookSpeed);
-                transform.position = Vector3.MoveTowards(transform.position, hit.point, 1000f * Time.deltaTime);
                 thisTrailRenderer.enabled = true;
+                transform.position = Vector3.MoveTowards(transform.position, hit.point, 200f * Time.deltaTime);
                 thisBoxCollider.enabled = true;
             }
         }
@@ -84,9 +93,26 @@ public class Shoot_Hook : MonoBehaviour {
         thisRigidBody.constraints = RigidbodyConstraints.FreezeAll;
         transform.parent = null;
 
-        playerRigidBody.constraints = RigidbodyConstraints.None;
-        playerRigidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        //playerRigidBody.constraints = RigidbodyConstraints.None;
+        //playerRigidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
         playerGrappleMove = true;
+
+        if(grappleDis < 2)
+        {
+            playerRigidBody.constraints = RigidbodyConstraints.None;
+            playerRigidBody.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+            playerRigidBody.useGravity = true;
+
+            transform.SetParent(Camera.main.transform);
+            transform.localPosition = savedLocalPosition;
+            transform.localEulerAngles = savedLocalRotation;
+            transform.localScale = savedLocalScale;
+
+            thisTrailRenderer.enabled = false;
+            thisTrailRenderer.Clear();
+
+            playerGrappleMove = false;
+        }
     }
 }
