@@ -23,6 +23,8 @@ public class Shoot_Hook : MonoBehaviour {
 
     public GameObject player;
 
+    public AudioSource spearAudioSource;
+
     public Vector3 grapplePos;
 
     Vector3 savedLocalPosition;
@@ -40,6 +42,7 @@ public class Shoot_Hook : MonoBehaviour {
         thisTrailRenderer = GetComponent<TrailRenderer>();
         mainCamera = GetComponentInParent<Camera>();
         playerRigidBody = player.GetComponent<Rigidbody>();
+        spearAudioSource = GetComponent<AudioSource>();
 
         savedLocalPosition = this.transform.localPosition;
         savedLocalRotation = this.transform.localEulerAngles;
@@ -66,12 +69,13 @@ public class Shoot_Hook : MonoBehaviour {
 
                 //GameObject hook = Instantiate(prefab) as GameObject;
                 //hook.transform.position = transform.position + Camera.main.transform.forward * 2;
+                spearAudioSource.Play();
+                thisTrailRenderer.enabled = true;
                 playerRigidBody.useGravity = false;
                 playerRigidBody.constraints = RigidbodyConstraints.FreezeAll;
                 thisRigidBody.isKinematic = false;
                 //thisRigidBody.AddForce(hit.point * hookSpeed);
-                thisTrailRenderer.enabled = true;
-                transform.position = Vector3.MoveTowards(transform.position, hit.point, 200f * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, hit.point, 100f * Time.deltaTime);
                 thisBoxCollider.enabled = true;
             }
         }

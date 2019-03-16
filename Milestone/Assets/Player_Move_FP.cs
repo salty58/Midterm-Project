@@ -12,10 +12,13 @@ public class Player_Move_FP : MonoBehaviour {
 
     public float fpForwardBackward; // input float from  W and S keys
     public float fpStrafe;  // input float from A D keys
+    public float gravity = -200f;
 
     public Vector3 inputVelocity;  // cumulative velocity to move character
 
     public float velocityModifier;  // velocity of conroller multiplied by this number
+
+    float verticalLook = 0f;
 
     //public float pitchMin;
     //public float pitchMax;
@@ -32,7 +35,9 @@ public class Player_Move_FP : MonoBehaviour {
         transform.Rotate(0, yaw, 0);
 
         pitch = Input.GetAxis("Mouse Y");
-        thisCamera.transform.Rotate(-pitch, 0, 0);
+        verticalLook += -pitch;
+        verticalLook = Mathf.Clamp(verticalLook, -80f, 80f);
+        thisCamera.transform.localEulerAngles = new Vector3(verticalLook, 0, 0);
         //thisCamera.transform.rotation = new Vector3(Mathf.Clamp(thisCamera.transform.rotation.x, pitchMin, pitchMax));
 
         fpForwardBackward = Input.GetAxis("Vertical");
@@ -41,11 +46,12 @@ public class Player_Move_FP : MonoBehaviour {
         inputVelocity = transform.forward * fpForwardBackward;
         inputVelocity += transform.right * fpStrafe;
 
-        
+        Physics.gravity = new Vector3(0, -gravity, 0);
     }
 
     void FixedUpdate()
     {
         thisRigidBody.velocity = inputVelocity * velocityModifier; // + (Physics.gravity * .69f);
+        //Physics.gravity = new Vector3(0, -gravity, 0);
     }
 }
